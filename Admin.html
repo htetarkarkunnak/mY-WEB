@@ -1,0 +1,2205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Liquid Glass Price List & Order Hub (Offline Edition)</title>
+  <style>
+    :root {
+      --orange-primary: #FF6B00;
+      --orange-secondary: #FF9500;
+      --orange-glow: rgba(255, 107, 0, 0.48);
+      --orange-soft: rgba(255, 138, 0, 0.16);
+      --bg-deep: #0B0A0E;
+      --bg-surface: #141218;
+      --glass-bg: rgba(28, 25, 33, 0.58);
+      --glass-bg-elevated: rgba(38, 34, 46, 0.74);
+      --glass-card-hover: rgba(48, 42, 58, 0.72);
+      --glass-border: rgba(255, 255, 255, 0.28);
+      --glass-border-subtle: rgba(255, 255, 255, 0.12);
+      --glass-highlight: inset 0 1px 1px rgba(255, 255, 255, 0.35), inset 0 -1px 1px rgba(255, 255, 255, 0.06);
+      --text-white: #FFFFFF;
+      --text-secondary: rgba(255, 255, 255, 0.78);
+      --text-muted: rgba(255, 255, 255, 0.52);
+      --danger: #FF453A;
+      --success: #32D74B;
+      --radius-xl: 26px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --radius-pill: 999px;
+      --shadow-glass: 0 22px 48px -12px rgba(0, 0, 0, 0.68), 0 4px 16px rgba(0, 0, 0, 0.4);
+      --spring-transition: all 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+      --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Padauk", "Noto Sans Myanmar", "Pyidaungsu", "Myanmar Text", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background-color: var(--bg-deep);
+      color: var(--text-white);
+      font-family: var(--font-stack);
+      line-height: 1.55;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient iOS 18 / visionOS Liquid Mesh Background */
+    .ambient-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 14% 18%, rgba(255, 107, 0, 0.24) 0%, transparent 42%),
+        radial-gradient(circle at 86% 22%, rgba(255, 149, 0, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 52% 88%, rgba(255, 82, 0, 0.20) 0%, transparent 50%),
+        linear-gradient(160deg, #09080C 0%, #151118 50%, #0C0A0F 100%);
+    }
+
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(75px);
+      opacity: 0.55;
+      pointer-events: none;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+
+    .orb-1 {
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, #FF6B00, transparent 70%);
+      top: -90px;
+      left: -80px;
+    }
+
+    .orb-2 {
+      width: 440px;
+      height: 440px;
+      background: radial-gradient(circle, #FF9500, transparent 70%);
+      bottom: -140px;
+      right: -90px;
+      animation-delay: -6s;
+    }
+
+    .orb-3 {
+      width: 290px;
+      height: 290px;
+      background: radial-gradient(circle, #FF5100, transparent 70%);
+      top: 42%;
+      left: 58%;
+      animation-delay: -11s;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(28px, -24px) scale(1.07); }
+      100% { transform: translate(-22px, 26px) scale(0.95); }
+    }
+
+    /* Core Liquid Glass Surface Utility */
+    .liquid-glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-highlight), var(--shadow-glass);
+    }
+
+    /* Sticky Top Navigation Header */
+    .top-navbar {
+      position: sticky;
+      top: 14px;
+      z-index: 100;
+      max-width: 1200px;
+      margin: 14px auto 0;
+      padding: 12px 20px;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: var(--spring-transition);
+    }
+
+    @media (max-width: 1240px) {
+      .top-navbar {
+        margin: 12px 16px 0;
+      }
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--orange-primary), var(--orange-secondary));
+      box-shadow: 0 6px 20px var(--orange-glow), inset 0 1px 1px rgba(255, 255, 255, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-text-group {
+      min-width: 0;
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .offline-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    /* Language Switcher Pill */
+    .lang-switcher {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(12, 10, 16, 0.55);
+      border: 1px solid var(--glass-border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 3px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+    }
+
+    .lang-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-stack);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: var(--spring-transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .lang-btn.active {
+      background: linear-gradient(135deg, var(--orange-primary), var(--orange-secondary));
+      color: var(--text-white);
+      box-shadow: 0 3px 12px var(--orange-glow), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+    }
+
+    /* Admin Button (Far Top-Right) */
+    .admin-trigger-btn {
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--text-white);
+      font-family: var(--font-stack);
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 8px 15px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35);
+      transition: var(--spring-transition);
+    }
+
+    .admin-trigger-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 107, 0, 0.35), rgba(255, 149, 0, 0.25));
+      border-color: rgba(255, 165, 80, 0.65);
+      transform: translateY(-1px);
+    }
+
+    .admin-trigger-btn.logged-in {
+      background: linear-gradient(135deg, var(--orange-primary), var(--orange-secondary));
+      border-color: rgba(255, 255, 255, 0.45);
+      box-shadow: 0 6px 18px var(--orange-glow);
+    }
+
+    /* Main Container & Hero Section */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 18px 80px;
+    }
+
+    .hero-banner {
+      padding: 28px 30px;
+      border-radius: var(--radius-xl);
+      margin-bottom: 26px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner::before {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      right: -50px;
+      top: -80px;
+      background: radial-gradient(circle, rgba(255, 125, 0, 0.32), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      max-width: 680px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 13px;
+      border-radius: var(--radius-pill);
+      background: var(--orange-soft);
+      border: 1px solid rgba(255, 149, 0, 0.45);
+      color: #FFB366;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: clamp(1.55rem, 3.2vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 8px;
+      background: linear-gradient(95deg, #FFFFFF 0%, #FFD5B0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.96rem;
+    }
+
+    /* Search & Quick Filter Bar */
+    .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .search-glass {
+      flex: 1;
+      min-width: 250px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 18px;
+      border-radius: var(--radius-pill);
+    }
+
+    .search-glass input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-white);
+      font-family: var(--font-stack);
+      font-size: 0.94rem;
+    }
+
+    .search-glass input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .catalog-count-pill {
+      padding: 10px 18px;
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Customer Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 24px;
+    }
+
+    .product-card {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: var(--spring-transition);
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      background: var(--glass-card-hover);
+      border-color: rgba(255, 165, 85, 0.55);
+      box-shadow: 0 28px 54px -12px rgba(0, 0, 0, 0.78), 0 0 28px rgba(255, 107, 0, 0.22), var(--glass-highlight);
+    }
+
+    .card-image-container {
+      position: relative;
+      width: 100%;
+      height: 205px;
+      overflow: hidden;
+      background: rgba(10, 9, 14, 0.65);
+      border-bottom: 1px solid var(--glass-border-subtle);
+    }
+
+    .card-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .product-card:hover .card-image {
+      transform: scale(1.07);
+    }
+
+    .starting-price-badge {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, rgba(255, 107, 0, 0.92), rgba(255, 149, 0, 0.92));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+      color: var(--text-white);
+      font-weight: 700;
+      font-size: 0.84rem;
+    }
+
+    .tier-count-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 11px;
+      border-radius: var(--radius-pill);
+      background: rgba(15, 13, 20, 0.72);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 20px 22px 22px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer-cta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--glass-border-subtle);
+      color: #FFA347;
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .card-arrow-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--orange-soft);
+      border: 1px solid rgba(255, 149, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--spring-transition);
+    }
+
+    .product-card:hover .card-arrow-circle {
+      background: linear-gradient(135deg, var(--orange-primary), var(--orange-secondary));
+      color: var(--text-white);
+      transform: translateX(3px);
+    }
+
+    /* Universal Modal Backdrop & Glass Dialog */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(6, 5, 10, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-dialog {
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      border-radius: var(--radius-xl);
+      background: var(--glass-bg-elevated);
+      backdrop-filter: blur(30px) saturate(190%);
+      -webkit-backdrop-filter: blur(30px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-highlight), 0 32px 68px rgba(0, 0, 0, 0.82);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(24px) scale(0.96);
+      transition: var(--spring-transition);
+    }
+
+    .modal-dialog.modal-wide {
+      max-width: 880px;
+    }
+
+    .modal-backdrop.open .modal-dialog {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--glass-border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-header-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .close-circle-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border-subtle);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--spring-transition);
+    }
+
+    .close-circle-btn:hover {
+      background: rgba(255, 69, 58, 0.25);
+      color: var(--text-white);
+      border-color: rgba(255, 69, 58, 0.5);
+    }
+
+    .modal-body {
+      padding: 22px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Product Summary Header Inside Price Modal */
+    .modal-product-hero {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border-subtle);
+      margin-bottom: 18px;
+    }
+
+    .modal-product-thumb {
+      width: 78px;
+      height: 78px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      flex-shrink: 0;
+    }
+
+    .modal-product-info h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .modal-product-info p {
+      font-size: 0.87rem;
+      color: var(--text-secondary);
+    }
+
+    .section-instruction {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #FFB067;
+      margin-bottom: 12px;
+    }
+
+    /* Interactive Price Rows with Small Circle Selector */
+    .price-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .price-row-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border-subtle);
+      cursor: pointer;
+      user-select: none;
+      transition: var(--spring-transition);
+    }
+
+    .price-row-item:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.26);
+    }
+
+    .price-row-item.selected {
+      background: linear-gradient(135deg, rgba(255, 107, 0, 0.22), rgba(255, 149, 0, 0.12));
+      border-color: var(--orange-secondary);
+      box-shadow: 0 8px 24px rgba(255, 107, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+    }
+
+    .price-row-left {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      min-width: 0;
+    }
+
+    /* Small Circle Selector */
+    .circle-selector {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.38);
+      background: rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: var(--spring-transition);
+    }
+
+    .circle-selector svg {
+      width: 13px;
+      height: 13px;
+      stroke: #FFFFFF;
+      stroke-width: 3;
+      opacity: 0;
+      transform: scale(0.4);
+      transition: var(--spring-transition);
+    }
+
+    .price-row-item.selected .circle-selector {
+      background: linear-gradient(135deg, var(--orange-primary), var(--orange-secondary));
+      border-color: #FFFFFF;
+      box-shadow: 0 0 14px var(--orange-glow);
+    }
+
+    .price-row-item.selected .circle-selector svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .package-label {
+      font-size: 0.96rem;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .package-price {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #FFB366;
+      white-space: nowrap;
+    }
+
+    .price-row-item.selected .package-price {
+      color: #FFFFFF;
+    }
+
+    /* Live Total Bar & Action Footer */
+    .live-total-bar {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(12, 10, 16, 0.68);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .total-meta span {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .total-amount-display {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #FFA347;
+    }
+
+    /* Buttons */
+    .btn-orange-glass {
+      width: 100%;
+      padding: 14px 22px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      background: linear-gradient(135deg, var(--orange-primary), var(--orange-secondary));
+      color: var(--text-white);
+      font-family: var(--font-stack);
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      box-shadow: 0 10px 26px var(--orange-glow), inset 0 1px 1px rgba(255, 255, 255, 0.55);
+      transition: var(--spring-transition);
+    }
+
+    .btn-orange-glass:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(255, 107, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.65);
+    }
+
+    .btn-orange-glass:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-secondary-glass {
+      padding: 12px 18px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-white);
+      font-family: var(--font-stack);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--spring-transition);
+    }
+
+    .btn-secondary-glass:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Step 2: Telegram Checkout View */
+    .telegram-seller-card {
+      padding: 15px 18px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(255, 107, 0, 0.16), rgba(255, 149, 0, 0.08));
+      border: 1px solid rgba(255, 149, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .seller-handle {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 0.01em;
+    }
+
+    .order-textarea-box {
+      width: 100%;
+      min-height: 155px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(10, 8, 14, 0.72);
+      border: 1px solid var(--glass-border-subtle);
+      color: var(--text-white);
+      font-family: var(--font-stack);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 14px;
+    }
+
+    .checkout-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 520px) {
+      .checkout-actions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Form Controls (Login & Admin Panel) */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 7px;
+    }
+
+    .glass-input, .glass-textarea, .glass-select {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: var(--radius-sm);
+      background: rgba(12, 10, 16, 0.65);
+      border: 1px solid var(--glass-border-subtle);
+      color: var(--text-white);
+      font-family: var(--font-stack);
+      font-size: 0.94rem;
+      outline: none;
+      transition: var(--spring-transition);
+    }
+
+    .glass-input:focus, .glass-textarea:focus, .glass-select:focus {
+      border-color: var(--orange-secondary);
+      box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.22);
+    }
+
+    .login-error-msg {
+      color: var(--danger);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 12px;
+      min-height: 20px;
+    }
+
+    @keyframes shakeError {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .shake {
+      animation: shakeError 0.4s ease;
+    }
+
+    /* Admin Dashboard Layout */
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 22px;
+    }
+
+    @media (max-width: 780px) {
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .admin-panel-card {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border-subtle);
+    }
+
+    .admin-panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: #FFB366;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .image-upload-zone {
+      border: 1.5px dashed rgba(255, 149, 0, 0.5);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      text-align: center;
+      background: rgba(255, 107, 0, 0.06);
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: var(--spring-transition);
+    }
+
+    .image-upload-zone:hover {
+      background: rgba(255, 107, 0, 0.12);
+      border-color: var(--orange-secondary);
+    }
+
+    .upload-preview-img {
+      width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-top: 10px;
+      display: none;
+      border: 1px solid var(--glass-border-subtle);
+    }
+
+    .tier-builder-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .tier-input-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 0.7fr auto;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .remove-tier-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 69, 58, 0.4);
+      background: rgba(255, 69, 58, 0.15);
+      color: #FF6961;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-product-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 430px;
+      overflow-y: auto;
+    }
+
+    .admin-product-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--glass-border-subtle);
+    }
+
+    .admin-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .admin-item-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 9px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .admin-item-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .admin-item-sub {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    .admin-item-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .icon-action-btn {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border-subtle);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-white);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .icon-action-btn.delete {
+      background: rgba(255, 69, 58, 0.16);
+      border-color: rgba(255, 69, 58, 0.4);
+      color: #FF6961;
+    }
+
+    /* Toast Notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      z-index: 350;
+      padding: 12px 22px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, rgba(32, 28, 38, 0.95), rgba(20, 18, 26, 0.95));
+      border: 1px solid var(--orange-secondary);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.75), 0 0 20px var(--orange-glow);
+      color: var(--text-white);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--spring-transition);
+    }
+
+    .toast-notification.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Liquid Glass Mesh Background -->
+  <div class="ambient-canvas">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+  </div>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="top-navbar liquid-glass">
+    <div class="brand-wrap">
+      <div class="brand-logo" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </div>
+      <div class="brand-text-group">
+        <div class="brand-title" data-i18n="brandTitle">OrangeGlass Digital Store</div>
+        <div class="offline-pill">
+          <span class="status-dot"></span>
+          <span data-i18n="offlineBadge">Offline Ready • Local Storage</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <!-- Language Switcher Toggle (EN | MM) -->
+      <div class="lang-switcher" role="group" aria-label="Language Switcher">
+        <button type="button" class="lang-btn active" id="langEnBtn" onclick="setLanguage('en')">EN</button>
+        <button type="button" class="lang-btn" id="langMmBtn" onclick="setLanguage('mm')">MM 🇲🇲</button>
+      </div>
+
+      <!-- Admin Upload Button (Far Top-Right) -->
+      <button type="button" class="admin-trigger-btn" id="adminNavBtn" onclick="handleAdminTrigger()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span data-i18n="adminBtn">Admin</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Customer View -->
+  <main class="main-container">
+    <section class="hero-banner liquid-glass">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span data-i18n="heroBadge">Instant Price Calculator & Telegram Checkout</span>
+        </div>
+        <h1 class="hero-title" data-i18n="heroTitle">Select Packages & Order in Seconds</h1>
+        <p class="hero-subtitle" data-i18n="heroSubtitle">
+          Tap any product card below to view full package prices, calculate multiple options live, and send your order directly to @HtetArkar_123.
+        </p>
+      </div>
+    </section>
+
+    <!-- Search & Filter Bar -->
+    <div class="toolbar-row">
+      <div class="search-glass liquid-glass">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2.2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" oninput="renderProductCatalog()" data-i18n-placeholder="searchPlaceholder" placeholder="Search products or packages..." />
+      </div>
+      <div class="catalog-count-pill liquid-glass" id="catalogCountText">3 Products</div>
+    </div>
+
+    <!-- Product Grid -->
+    <section class="product-grid" id="productGrid"></section>
+  </main>
+
+  <!-- 1. INTERACTIVE PRICE LIST & TELEGRAM ORDER MODAL -->
+  <div class="modal-backdrop" id="priceModalBackdrop" onclick="closeModalOnBackdrop(event, 'priceModalBackdrop')">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2.3">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <span id="priceModalHeaderTitle" data-i18n="modalSelectTitle">Select Package Options</span>
+        </div>
+        <button type="button" class="close-circle-btn" onclick="closePriceModal()" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- STEP 1: Select & Calculate -->
+        <div id="modalStep1">
+          <div class="modal-product-hero">
+            <img id="modalProductImg" class="modal-product-thumb" src="" alt="Product" />
+            <div class="modal-product-info">
+              <h3 id="modalProductTitle"></h3>
+              <p id="modalProductDesc"></p>
+            </div>
+          </div>
+
+          <div class="section-instruction">
+            <span data-i18n="tapCircleHint">Tap circle to select one or multiple packages</span>
+            <span id="selectedCountBadge">0 Selected</span>
+          </div>
+
+          <div class="price-options-list" id="modalPriceList"></div>
+
+          <div class="live-total-bar">
+            <div class="total-meta">
+              <span data-i18n="liveTotalLabel">Estimated Total Price</span>
+              <strong id="selectedItemsSubtext" style="font-size:0.8rem; color:rgba(255,255,255,0.65);">--</strong>
+            </div>
+            <div class="total-amount-display" id="liveTotalValue">0 MMK</div>
+          </div>
+
+          <button type="button" class="btn-orange-glass" id="confirmSelectionBtn" onclick="proceedToTelegramStep()" disabled>
+            <span data-i18n="confirmBtn">Confirm</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- STEP 2: Telegram Order & Fast Copy View -->
+        <div id="modalStep2" class="hidden">
+          <div class="telegram-seller-card">
+            <div>
+              <div style="font-size:0.76rem; color:rgba(255,255,255,0.72);" data-i18n="officialSellerLabel">Official Telegram Seller</div>
+              <div class="seller-handle">@HtetArkar_123</div>
+            </div>
+            <span style="padding:5px 12px; border-radius:999px; background:rgba(50,215,75,0.18); border:1px solid rgba(50,215,75,0.45); color:#32D74B; font-size:0.76rem; font-weight:700;">
+              ● Verified
+            </span>
+          </div>
+
+          <label class="form-label" data-i18n="autoGeneratedOrderLabel">Auto-Generated Order Summary (Ready to Copy / Send):</label>
+          <textarea id="generatedOrderText" class="order-textarea-box" readonly></textarea>
+
+          <div class="checkout-actions-grid">
+            <button type="button" class="btn-secondary-glass" onclick="copyOrderTextOnly()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span data-i18n="copyTextBtn">Copy Text</span>
+            </button>
+
+            <button type="button" class="btn-orange-glass" onclick="buyNowTelegramRedirect()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              <span data-i18n="buyNowBtn">Buy Now</span>
+            </button>
+          </div>
+
+          <button type="button" class="btn-secondary-glass" style="width:100%;" onclick="backToPriceStep()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span data-i18n="backToPackagesBtn">Back to Package Selection</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ADMIN LOGIN MODAL (ZERO CREDENTIAL HINTS) -->
+  <div class="modal-backdrop" id="loginModalBackdrop" onclick="closeModalOnBackdrop(event, 'loginModalBackdrop')">
+    <div class="modal-dialog" style="max-width: 420px;" id="loginModalCard">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2.2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span data-i18n="adminLoginTitle">Admin Authentication</span>
+        </div>
+        <button type="button" class="close-circle-btn" onclick="closeLoginModal()" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form onsubmit="submitAdminLogin(event)" autocomplete="off">
+          <div class="form-group">
+            <label class="form-label" data-i18n="usernameLabel">Username</label>
+            <input type="text" id="adminUsernameInput" class="glass-input" required autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="passwordLabel">Password</label>
+            <input type="password" id="adminPasswordInput" class="glass-input" required autocomplete="new-password" />
+          </div>
+          <div class="login-error-msg" id="loginErrorText"></div>
+          <button type="submit" class="btn-orange-glass">
+            <span data-i18n="signInBtn">Unlock Admin Panel</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ADMIN UPLOAD & PRODUCT MANAGEMENT PANEL -->
+  <div class="modal-backdrop" id="adminPanelBackdrop" onclick="closeModalOnBackdrop(event, 'adminPanelBackdrop')">
+    <div class="modal-dialog modal-wide">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2.2">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          <span data-i18n="adminDashboardTitle">Admin Product Upload & Management</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" class="icon-action-btn" onclick="logoutAdmin()" style="padding:7px 13px; border-radius:999px;">
+            <span data-i18n="logoutBtn">Logout</span>
+          </button>
+          <button type="button" class="close-circle-btn" onclick="closeAdminPanel()" aria-label="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="admin-grid">
+          <!-- Left Column: Create / Edit Product Form -->
+          <div class="admin-panel-card">
+            <div class="admin-panel-title">
+              <span id="formModeTitle" data-i18n="addNewProductTitle">Upload / Edit Product</span>
+              <button type="button" class="icon-action-btn" onclick="resetAdminForm()" data-i18n="resetFormBtn">Reset</button>
+            </div>
+
+            <form onsubmit="saveAdminProduct(event)">
+              <input type="hidden" id="editingProductId" />
+
+              <!-- Offline Image Upload or Data URI / URL -->
+              <div class="form-group">
+                <label class="form-label" data-i18n="productImageLabel">1. Product Image (Device Upload or URL)</label>
+                <div class="image-upload-zone" onclick="document.getElementById('deviceImageInput').click()">
+                  <div style="font-size:0.84rem; font-weight:600; color:#FFB366;" data-i18n="clickToUploadText">
+                    Tap to Choose Image from Device (Auto-Compressed Offline)
+                  </div>
+                  <input type="file" id="deviceImageInput" accept="image/*" style="display:none;" onchange="handleDeviceImageUpload(event)" />
+                  <img id="adminImagePreview" class="upload-preview-img" alt="Preview" />
+                </div>
+                <input type="text" id="adminImageUrlInput" class="glass-input" placeholder="Or paste Image URL / Data URI..." oninput="previewUrlImage(this.value)" />
+              </div>
+
+              <!-- Product Title & Value Description -->
+              <div class="form-group">
+                <label class="form-label" data-i18n="productNameLabel">2. Product Title</label>
+                <input type="text" id="adminProductName" class="glass-input" required placeholder="e.g. Mobile Legends Diamonds" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" data-i18n="productDescLabel">3. Clear Value Description</label>
+                <textarea id="adminProductDesc" class="glass-textarea" rows="2" required placeholder="Fast ID top-up, instant delivery, 24/7 support..."></textarea>
+              </div>
+
+              <!-- Dynamic Price List Builder -->
+              <div class="form-group">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                  <label class="form-label" style="margin-bottom:0;" data-i18n="priceBuilderLabel">4. Dynamic Price List Packages</label>
+                  <button type="button" class="icon-action-btn" style="color:#FFB366; border-color:rgba(255,149,0,0.5);" onclick="addAdminTierRow()">
+                    + <span data-i18n="addPriceOptionBtn">Add Price Option</span>
+                  </button>
+                </div>
+                <div class="tier-builder-rows" id="adminTierRowsContainer"></div>
+              </div>
+
+              <button type="submit" class="btn-orange-glass">
+                <span data-i18n="saveProductBtn">Save Product to Catalog</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Right Column: Manage Existing Products & Offline Backup -->
+          <div class="admin-panel-card" style="display:flex; flex-direction:column; justify-content:space-between; gap:16px;">
+            <div>
+              <div class="admin-panel-title">
+                <span data-i18n="manageProductsTitle">Current Catalog</span>
+              </div>
+              <div class="admin-product-list" id="adminProductList"></div>
+            </div>
+
+            <!-- Offline JSON Backup / Restore -->
+            <div style="border-top:1px solid var(--glass-border-subtle); padding-top:14px;">
+              <div style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:8px;" data-i18n="offlineBackupTitle">
+                Offline Data Backup (.JSON)
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="icon-action-btn" onclick="exportCatalogJson()">
+                  <span data-i18n="exportBtn">Export JSON</span>
+                </button>
+                <button type="button" class="icon-action-btn" onclick="document.getElementById('importJsonInput').click()">
+                  <span data-i18n="importBtn">Import JSON</span>
+                </button>
+                <input type="file" id="importJsonInput" accept=".json" style="display:none;" onchange="importCatalogJson(event)" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-notification" id="toastBox">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2.5">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toastMessage">Copied!</span>
+  </div>
+
+  <script>
+    /********************************************************************
+     * 1. OFFLINE SVG ARTWORK GENERATOR (Zero External URL Dependencies)
+     ********************************************************************/
+    function createOfflineSvgArtwork(title, subtitle, accentStart, accentEnd, iconMarkup) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+        <defs>
+          <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#14111A"/>
+            <stop offset="55%" stop-color="#1E1724"/>
+            <stop offset="100%" stop-color="#0E0C12"/>
+          </linearGradient>
+          <linearGradient id="orb" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${accentStart}"/>
+            <stop offset="100%" stop-color="${accentEnd}"/>
+          </linearGradient>
+        </defs>
+        <rect width="800" height="500" fill="url(#bg)"/>
+        <circle cx="660" cy="110" r="190" fill="url(#orb)" opacity="0.28"/>
+        <circle cx="140" cy="410" r="210" fill="url(#orb)" opacity="0.2"/>
+        <rect x="55" y="55" width="690" height="390" rx="34" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+        <g transform="translate(95, 110)">
+          <rect width="96" height="96" rx="26" fill="url(#orb)"/>
+          ${iconMarkup}
+        </g>
+        <text x="95" y="275" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="40" font-weight="800">${title}</text>
+        <text x="95" y="325" fill="rgba(255,255,255,0.75)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="23" font-weight="500">${subtitle}</text>
+      </svg>`;
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+
+    /********************************************************************
+     * 2. BILINGUAL DICTIONARY (ENGLISH & MYANMAR UNICODE)
+     ********************************************************************/
+    const I18N = {
+      en: {
+        brandTitle: "OrangeGlass Digital Hub",
+        offlineBadge: "Offline Ready • Local Storage",
+        adminBtn: "Admin",
+        heroBadge: "Instant Price Calculator & Telegram Checkout",
+        heroTitle: "Select Packages & Order in Seconds",
+        heroSubtitle: "Tap any product card below to view full package prices, calculate multiple options live, and send your order directly to @HtetArkar_123.",
+        searchPlaceholder: "Search products or packages...",
+        productsAvailable: "Products Available",
+        startingFrom: "From",
+        packagesCount: "Packages",
+        viewPricesCta: "View Price List & Order",
+        modalSelectTitle: "Select Package Options",
+        tapCircleHint: "Tap circle to select one or multiple packages",
+        selectedText: "Selected",
+        liveTotalLabel: "Total Price",
+        noOptionSelected: "Select at least 1 package",
+        confirmBtn: "Confirm",
+        officialSellerLabel: "Official Telegram Seller",
+        autoGeneratedOrderLabel: "Auto-Generated Order Summary:",
+        copyTextBtn: "Copy Text",
+        buyNowBtn: "Buy Now",
+        backToPackagesBtn: "Back to Package Selection",
+        adminLoginTitle: "Admin Authentication",
+        usernameLabel: "Username",
+        passwordLabel: "Password",
+        signInBtn: "Unlock Admin Panel",
+        loginError: "Invalid username or password. Please try again.",
+        adminDashboardTitle: "Admin Upload & Catalog Manager",
+        logoutBtn: "Logout",
+        addNewProductTitle: "Upload / Edit Product",
+        resetFormBtn: "Clear",
+        productImageLabel: "1. Product Image (Device Upload or URL)",
+        clickToUploadText: "Tap to Upload Photo from Device (Works Offline)",
+        productNameLabel: "2. Product Name",
+        productDescLabel: "3. Clear Value Description",
+        priceBuilderLabel: "4. Price List Packages",
+        addPriceOptionBtn: "Add Price Option",
+        saveProductBtn: "Save Product",
+        manageProductsTitle: "Manage Existing Products",
+        offlineBackupTitle: "Offline Data Backup (.JSON)",
+        exportBtn: "Export Backup",
+        importBtn: "Import Backup",
+        toastCopied: "Copied! Ready to paste in Telegram.",
+        toastSaved: "Product saved to LocalStorage!",
+        toastDeleted: "Product removed.",
+        editBtn: "Edit",
+        deleteBtn: "Delete"
+      },
+      mm: {
+        brandTitle: "OrangeGlass စျေးနှုန်းနှင့် အော်ဒါစနစ်",
+        offlineBadge: "အော့ဖ်လိုင်း အသုံးပြုနိုင်သည် • Local Storage",
+        adminBtn: "Admin",
+        heroBadge: "စျေးနှုန်းတွက်ချက်စနစ် နှင့် Telegram အော်ဒါ",
+        heroTitle: "မိမိလိုချင်သော Package များကို ရွေးချယ်ဝယ်ယူပါ",
+        heroSubtitle: "နှစ်သက်ရာ ပစ္စည်းကဒ်ကိုနှိပ်ပြီး စျေးနှုန်းစာရင်းအပြည့်အစုံကို ကြည့်ရှုကာ @HtetArkar_123 သို့ တိုက်ရိုက်အော်ဒါတင်နိုင်ပါသည်။",
+        searchPlaceholder: "ပစ္စည်းအမည် သို့မဟုတ် Package ရှာဖွေရန်...",
+        productsAvailable: "မျိုး ရရှိနိုင်ပါသည်",
+        startingFrom: "အနည်းဆုံး",
+        packagesCount: "မျိုး",
+        viewPricesCta: "စျေးနှုန်းကြည့်ရန် နှင့် ဝယ်ယူရန်",
+        modalSelectTitle: "Package နှင့် စျေးနှုန်းရွေးချယ်ရန်",
+        tapCircleHint: "စက်ဝိုင်းလေးများကိုနှိပ်ပြီး တစ်ခု သို့မဟုတ် အများ ရွေးချယ်နိုင်သည်",
+        selectedText: "ခု ရွေးချယ်ထားသည်",
+        liveTotalLabel: "စုစုပေါင်း ကျသင့်ငွေ",
+        noOptionSelected: "အနည်းဆုံး Package (၁) ခု ရွေးချယ်ပေးပါ",
+        confirmBtn: "အတည်ပြုမည်",
+        officialSellerLabel: "ဆက်သွယ်ဝယ်ယူရမည့် Telegram အကောင့်",
+        autoGeneratedOrderLabel: "အော်တိုထုတ်ပေးထားသော အော်ဒါစာသား (Copy ကူးရန်):",
+        copyTextBtn: "စာသားကူးယူမည်",
+        buyNowBtn: "ဝယ်ယူမည်",
+        backToPackagesBtn: "Package ပြန်ရွေးမည်",
+        adminLoginTitle: "Admin ဝင်ရောက်ရန်",
+        usernameLabel: "အသုံးပြုသူအမည် (Username)",
+        passwordLabel: "စကားဝှက် (Password)",
+        signInBtn: "Admin Panel ဖွင့်မည်",
+        loginError: "Username သို့မဟုတ် Password မှားယွင်းနေပါသည်။",
+        adminDashboardTitle: "Admin ပစ္စည်းတင်ရန် နှင့် စီမံခန့်ခွဲရန်",
+        logoutBtn: "ထွက်မည်",
+        addNewProductTitle: "ပစ္စည်းအသစ်တင်ရန် / ပြင်ဆင်ရန်",
+        resetFormBtn: "အသစ်ပြန်စမည်",
+        productImageLabel: "၁။ ပစ္စည်းပုံ တင်ရန် (ဖုန်းထဲမှပုံ သို့မဟုတ် Link)",
+        clickToUploadText: "ဖုန်း/ကွန်ပျူတာထဲမှ ပုံရွေးရန် နှိပ်ပါ (အော့ဖ်လိုင်းသုံးနိုင်သည်)",
+        productNameLabel: "၂။ ပစ္စည်းအမည်",
+        productDescLabel: "၃။ ပစ္စည်းအကြောင်းအရာ အသေးစိတ်",
+        priceBuilderLabel: "၄။ စျေးနှုန်းစာရင်းများ ထည့်သွင်းရန်",
+        addPriceOptionBtn: "စျေးနှုန်းအသစ်ထပ်ထည့်မည်",
+        saveProductBtn: "စာရင်းသိမ်းဆည်းမည်",
+        manageProductsTitle: "လက်ရှိတင်ထားသော ပစ္စည်းများ",
+        offlineBackupTitle: "အော့ဖ်လိုင်း ဒေတာသိမ်းဆည်းမှု (.JSON)",
+        exportBtn: "Backup ထုတ်ယူမည်",
+        importBtn: "Backup ပြန်ထည့်မည်",
+        toastCopied: "ကူးယူပြီးပါပြီ! Telegram တွင် Paste ချနိုင်ပါပြီ။",
+        toastSaved: "ပစ္စည်းစာရင်း သိမ်းဆည်းပြီးပါပြီ!",
+        toastDeleted: "ပစ္စည်းစာရင်း ဖျက်ပြီးပါပြီ။",
+        editBtn: "ပြင်မည်",
+        deleteBtn: "ဖျက်မည်"
+      }
+    };
+
+    /********************************************************************
+     * 3. PRE-LOADED SAMPLE PRODUCTS (100% Offline Ready)
+     ********************************************************************/
+    const DEFAULT_PRODUCTS = [
+      {
+        id: "prod_mlbb_1",
+        name: "Mobile Legends: Bang Bang Diamonds",
+        description: "Instant Player ID + Zone ID Direct Top-Up • Official Double Diamond Bonus Eligible • 24/7 Fast Delivery",
+        image: createOfflineSvgArtwork(
+          "MLBB DIAMONDS",
+          "Instant ID Top-Up • Weekly Pass & Twilight Pass",
+          "#FF6B00",
+          "#FFB300",
+          `<polygon points="48,18 76,48 48,78 20,48" fill="none" stroke="#FFFFFF" stroke-width="5"/>`
+        ),
+        prices: [
+          { id: "p1", label: "Weekly Diamond Pass (x1)", amount: 6500, currency: "MMK" },
+          { id: "p2", label: "86 Diamonds (78 + 8 Bonus)", amount: 5200, currency: "MMK" },
+          { id: "p3", label: "172 Diamonds (156 + 16 Bonus)", amount: 10300, currency: "MMK" },
+          { id: "p4", label: "257 Diamonds (234 + 23 Bonus)", amount: 15200, currency: "MMK" },
+          { id: "p5", label: "706 Diamonds (625 + 81 Bonus)", amount: 40500, currency: "MMK" }
+        ]
+      },
+      {
+        id: "prod_tg_2",
+        name: "Telegram Premium & Stars Subscription",
+        description: "Official Telegram Premium Gift Link & Instant Stars Top-Up • No Login Required • Full Warranty",
+        image: createOfflineSvgArtwork(
+          "TELEGRAM PREMIUM",
+          "Official Gift Activation & Stars Packages",
+          "#FF5500",
+          "#FF9500",
+          `<polygon points="22,48 74,24 58,76 44,56 22,48" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linejoin="round"/>`
+        ),
+        prices: [
+          { id: "t1", label: "Telegram Premium — 3 Months", amount: 45000, currency: "MMK" },
+          { id: "t2", label: "Telegram Premium — 6 Months", amount: 62000, currency: "MMK" },
+          { id: "t3", label: "Telegram Premium — 12 Months (Best Value)", amount: 112000, currency: "MMK" },
+          { id: "t4", label: "500 Telegram Stars Pack", amount: 34000, currency: "MMK" }
+        ]
+      },
+      {
+        id: "prod_pubg_3",
+        name: "PUBG Mobile Global UC Pack",
+        description: "Global Server Player ID Top-Up • Instant Royal Pass Upgrade Ready • Safe & Verified Channel",
+        image: createOfflineSvgArtwork(
+          "PUBG MOBILE UC",
+          "Global Server UID Top-Up • Royal Pass Ready",
+          "#FF7700",
+          "#FF3D00",
+          `<rect x="22" y="28" width="52" height="40" rx="8" fill="none" stroke="#FFFFFF" stroke-width="5"/><circle cx="48" cy="48" r="9" fill="#FFFFFF"/>`
+        ),
+        prices: [
+          { id: "u1", label: "60 UC Global Pack", amount: 3900, currency: "MMK" },
+          { id: "u2", label: "325 UC (300 + 25 Bonus)", amount: 19200, currency: "MMK" },
+          { id: "u3", label: "660 UC (600 + 60 Bonus)", amount: 38000, currency: "MMK" },
+          { id: "u4", label: "1800 UC (1500 + 300 Bonus)", amount: 94500, currency: "MMK" }
+        ]
+      }
+    ];
+
+    /********************************************************************
+     * 4. STATE MANAGEMENT & LOCALSTORAGE PERSISTENCE
+     ********************************************************************/
+    const STORAGE_KEY = "orangeglass_offline_catalog_v1";
+    const LANG_KEY = "orangeglass_offline_lang_v1";
+
+    let currentLang = localStorage.getItem(LANG_KEY) || "en";
+    let products = loadProductsFromStorage();
+    let activeProduct = null;
+    let selectedTierIndices = new Set();
+    let isAdminAuthenticated = false;
+
+    function loadProductsFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PRODUCTS));
+          return JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+        }
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+      } catch (e) {
+        return JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+      }
+    }
+
+    function saveProductsToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+      } catch (err) {
+        alert("LocalStorage quota reached. Please upload smaller images or remove unused items.");
+      }
+    }
+
+    function formatNumber(num) {
+      return Number(num || 0).toLocaleString("en-US");
+    }
+
+    /********************************************************************
+     * 5. LANGUAGE SWITCHING ENGINE (EN | MM)
+     ********************************************************************/
+    function setLanguage(lang) {
+      currentLang = lang === "mm" ? "mm" : "en";
+      localStorage.setItem(LANG_KEY, currentLang);
+
+      document.getElementById("langEnBtn").classList.toggle("active", currentLang === "en");
+      document.getElementById("langMmBtn").classList.toggle("active", currentLang === "mm");
+
+      const dict = I18N[currentLang];
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (dict[key]) el.setAttribute("placeholder", dict[key]);
+      });
+
+      renderProductCatalog();
+      if (activeProduct) {
+        updateLiveTotalCalculation();
+      }
+      if (isAdminAuthenticated) {
+        renderAdminProductList();
+      }
+    }
+
+    /********************************************************************
+     * 6. CUSTOMER CATALOG RENDERING
+     ********************************************************************/
+    function renderProductCatalog() {
+      const grid = document.getElementById("productGrid");
+      const query = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+      const dict = I18N[currentLang];
+
+      const filtered = products.filter(p => {
+        const matchMain = p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query);
+        const matchTiers = (p.prices || []).some(t => t.label.toLowerCase().includes(query));
+        return matchMain || matchTiers;
+      });
+
+      document.getElementById("catalogCountText").textContent = `${filtered.length} ${dict.productsAvailable}`;
+
+      grid.innerHTML = filtered.map(product => {
+        const prices = product.prices || [];
+        const minTier = prices.reduce((min, t) => (Number(t.amount) < Number(min.amount) ? t : min), prices[0] || { amount: 0, currency: "MMK" });
+
+        return `
+          <article class="product-card liquid-glass" onclick="openPriceModal('${product.id}')">
+            <div class="card-image-container">
+              <img class="card-image" src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" loading="lazy" />
+              <span class="tier-count-tag">${prices.length} ${dict.packagesCount}</span>
+              <span class="starting-price-badge">${dict.startingFrom} ${formatNumber(minTier.amount)} ${escapeHtml(minTier.currency)}</span>
+            </div>
+            <div class="card-body">
+              <div>
+                <h2 class="card-title">${escapeHtml(product.name)}</h2>
+                <p class="card-desc">${escapeHtml(product.description)}</p>
+              </div>
+              <div class="card-footer-cta">
+                <span>${dict.viewPricesCta}</span>
+                <span class="card-arrow-circle">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    /********************************************************************
+     * 7. INTERACTIVE PRICE LIST MODAL & CIRCLE SELECTOR
+     ********************************************************************/
+    function openPriceModal(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+
+      activeProduct = product;
+      selectedTierIndices.clear();
+
+      document.getElementById("modalProductImg").src = product.image;
+      document.getElementById("modalProductTitle").textContent = product.name;
+      document.getElementById("modalProductDesc").textContent = product.description;
+
+      document.getElementById("modalStep1").classList.remove("hidden");
+      document.getElementById("modalStep2").classList.add("hidden");
+
+      renderModalPriceRows();
+      updateLiveTotalCalculation();
+
+      document.getElementById("priceModalBackdrop").classList.add("open");
+    }
+
+    function renderModalPriceRows() {
+      if (!activeProduct) return;
+      const listEl = document.getElementById("modalPriceList");
+
+      listEl.innerHTML = (activeProduct.prices || []).map((tier, idx) => {
+        const isSelected = selectedTierIndices.has(idx);
+        return `
+          <div class="price-row-item ${isSelected ? 'selected' : ''}" onclick="togglePriceTier(${idx})">
+            <div class="price-row-left">
+              <div class="circle-selector" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="package-label">${escapeHtml(tier.label)}</div>
+            </div>
+            <div class="package-price">${formatNumber(tier.amount)} ${escapeHtml(tier.currency)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function togglePriceTier(index) {
+      if (selectedTierIndices.has(index)) {
+        selectedTierIndices.delete(index);
+      } else {
+        selectedTierIndices.add(index);
+      }
+      renderModalPriceRows();
+      updateLiveTotalCalculation();
+    }
+
+    function calculateTotalsByCurrency() {
+      const totals = {};
+      if (!activeProduct) return totals;
+      selectedTierIndices.forEach(idx => {
+        const tier = activeProduct.prices[idx];
+        if (tier) {
+          const curr = tier.currency || "MMK";
+          totals[curr] = (totals[curr] || 0) + Number(tier.amount || 0);
+        }
+      });
+      return totals;
+    }
+
+    function formatTotalsString(totalsObj) {
+      const entries = Object.entries(totalsObj);
+      if (entries.length === 0) return "0 MMK";
+      return entries.map(([curr, sum]) => `${formatNumber(sum)} ${curr}`).join(" + ");
+    }
+
+    function updateLiveTotalCalculation() {
+      const dict = I18N[currentLang];
+      const count = selectedTierIndices.size;
+
+      document.getElementById("selectedCountBadge").textContent = `${count} ${dict.selectedText}`;
+
+      const totals = calculateTotalsByCurrency();
+      document.getElementById("liveTotalValue").textContent = formatTotalsString(totals);
+
+      const subtextEl = document.getElementById("selectedItemsSubtext");
+      const confirmBtn = document.getElementById("confirmSelectionBtn");
+
+      if (count === 0) {
+        subtextEl.textContent = dict.noOptionSelected;
+        confirmBtn.disabled = true;
+      } else {
+        const names = Array.from(selectedTierIndices).map(i => activeProduct.prices[i].label);
+        subtextEl.textContent = names.join(", ");
+        confirmBtn.disabled = false;
+      }
+    }
+
+    /********************************************************************
+     * 8. STEP 2: TELEGRAM ORDER GENERATION & OFFLINE-SAFE COPY
+     ********************************************************************/
+    function buildOrderSummaryText() {
+      if (!activeProduct) return "";
+      const selectedTiers = Array.from(selectedTierIndices).map(i => activeProduct.prices[i]).filter(Boolean);
+      const totalStr = formatTotalsString(calculateTotalsByCurrency());
+
+      if (currentLang === "mm") {
+        const lines = [
+          "🟠 အော်ဒါစာရင်းအသစ် (Order Summary)",
+          "━━━━━━━━━━━━━━━━━━━━",
+          `📦 ပစ္စည်းအမည် : ${activeProduct.name}`,
+          "📋 ရွေးချယ်ထားသော Package များ :"
+        ];
+        selectedTiers.forEach((t, idx) => {
+          lines.push(`   ${idx + 1}. ${t.label} — ${formatNumber(t.amount)} ${t.currency}`);
+        });
+        lines.push("━━━━━━━━━━━━━━━━━━━━");
+        lines.push(`💰 စုစုပေါင်းကျသင့်ငွေ : ${totalStr}`);
+        lines.push(`👤 ဆက်သွယ်ရန် : @HtetArkar_123`);
+        return lines.join("\n");
+      } else {
+        const lines = [
+          "🟠 NEW ORDER SUMMARY",
+          "━━━━━━━━━━━━━━━━━━━━",
+          `📦 Product: ${activeProduct.name}`,
+          "📋 Selected Package(s):"
+        ];
+        selectedTiers.forEach((t, idx) => {
+          lines.push(`   ${idx + 1}. ${t.label} — ${formatNumber(t.amount)} ${t.currency}`);
+        });
+        lines.push("━━━━━━━━━━━━━━━━━━━━");
+        lines.push(`💰 Total Amount: ${totalStr}`);
+        lines.push(`👤 Seller: @HtetArkar_123`);
+        return lines.join("\n");
+      }
+    }
+
+    function proceedToTelegramStep() {
+      if (selectedTierIndices.size === 0) return;
+      document.getElementById("generatedOrderText").value = buildOrderSummaryText();
+      document.getElementById("modalStep1").classList.add("hidden");
+      document.getElementById("modalStep2").classList.remove("hidden");
+    }
+
+    function backToPriceStep() {
+      document.getElementById("modalStep2").classList.add("hidden");
+      document.getElementById("modalStep1").classList.remove("hidden");
+    }
+
+    function closePriceModal() {
+      document.getElementById("priceModalBackdrop").classList.remove("open");
+    }
+
+    /* Offline-Compatible Clipboard Copy (Works on both HTTPS and local file://) */
+    function copyTextOfflineSafe(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
+      } else {
+        return Promise.resolve(fallbackCopyText(text));
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const tempArea = document.createElement("textarea");
+      tempArea.value = text;
+      tempArea.style.position = "fixed";
+      tempArea.style.left = "-9999px";
+      document.body.appendChild(tempArea);
+      tempArea.focus();
+      tempArea.select();
+      try {
+        document.execCommand("copy");
+      } catch (e) {}
+      document.body.removeChild(tempArea);
+    }
+
+    function copyOrderTextOnly() {
+      const text = document.getElementById("generatedOrderText").value;
+      copyTextOfflineSafe(text).then(() => {
+        showToast(I18N[currentLang].toastCopied);
+      });
+    }
+
+    function buyNowTelegramRedirect() {
+      const text = document.getElementById("generatedOrderText").value;
+      copyTextOfflineSafe(text).then(() => {
+        showToast(I18N[currentLang].toastCopied);
+        const encoded = encodeURIComponent(text);
+        const tgUrl = `https://t.me/HtetArkar_123?text=${encoded}`;
+        window.open(tgUrl, "_blank", "noopener,noreferrer");
+      });
+    }
+
+    /********************************************************************
+     * 9. ADMIN AUTHENTICATION & MANAGEMENT PANEL
+     ********************************************************************/
+    const ADMIN_USER = "Htet";
+    const ADMIN_PASS = "673764389";
+
+    function handleAdminTrigger() {
+      if (isAdminAuthenticated) {
+        openAdminPanel();
+      } else {
+        document.getElementById("adminUsernameInput").value = "";
+        document.getElementById("adminPasswordInput").value = "";
+        document.getElementById("loginErrorText").textContent = "";
+        document.getElementById("loginModalBackdrop").classList.add("open");
+      }
+    }
+
+    function closeLoginModal() {
+      document.getElementById("loginModalBackdrop").classList.remove("open");
+    }
+
+    function submitAdminLogin(event) {
+      event.preventDefault();
+      const user = document.getElementById("adminUsernameInput").value.trim();
+      const pass = document.getElementById("adminPasswordInput").value;
+
+      if (user === ADMIN_USER && pass === ADMIN_PASS) {
+        isAdminAuthenticated = true;
+        document.getElementById("adminNavBtn").classList.add("logged-in");
+        closeLoginModal();
+        openAdminPanel();
+      } else {
+        const card = document.getElementById("loginModalCard");
+        document.getElementById("loginErrorText").textContent = I18N[currentLang].loginError;
+        card.classList.remove("shake");
+        void card.offsetWidth;
+        card.classList.add("shake");
+      }
+    }
+
+    function logoutAdmin() {
+      isAdminAuthenticated = false;
+      document.getElementById("adminNavBtn").classList.remove("logged-in");
+      closeAdminPanel();
+    }
+
+    function openAdminPanel() {
+      resetAdminForm();
+      renderAdminProductList();
+      document.getElementById("adminPanelBackdrop").classList.add("open");
+    }
+
+    function closeAdminPanel() {
+      document.getElementById("adminPanelBackdrop").classList.remove("open");
+    }
+
+    /* Offline HTML5 Canvas Image Compressor to Base64 */
+    function handleDeviceImageUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 720;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.84);
+          document.getElementById("adminImageUrlInput").value = compressedDataUrl;
+          previewUrlImage(compressedDataUrl);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewUrlImage(url) {
+      const preview = document.getElementById("adminImagePreview");
+      if (url && url.trim() !== "") {
+        preview.src = url.trim();
+        preview.style.display = "block";
+      } else {
+        preview.src = "";
+        preview.style.display = "none";
+      }
+    }
+
+    function addAdminTierRow(label = "", amount = "", currency = "MMK") {
+      const container = document.getElementById("adminTierRowsContainer");
+      const row = document.createElement("div");
+      row.className = "tier-input-row";
+      row.innerHTML = `
+        <input type="text" class="glass-input tier-label-in" placeholder="Package Name (e.g. 172 Diamonds)" value="${escapeHtml(label)}" required />
+        <input type="number" step="any" min="0" class="glass-input tier-amount-in" placeholder="Price" value="${escapeHtml(String(amount))}" required />
+        <input type="text" class="glass-input tier-curr-in" placeholder="MMK / $" value="${escapeHtml(currency)}" required />
+        <button type="button" class="remove-tier-btn" onclick="removeAdminTierRow(this)" title="Remove">✕</button>
+      `;
+      container.appendChild(row);
+    }
+
+    function removeAdminTierRow(btn) {
+      const container = document.getElementById("adminTierRowsContainer");
+      if (container.children.length > 1) {
+        btn.parentElement.remove();
+      }
+    }
+
+    function resetAdminForm() {
+      document.getElementById("editingProductId").value = "";
+      document.getElementById("adminProductName").value = "";
+      document.getElementById("adminProductDesc").value = "";
+      document.getElementById("adminImageUrlInput").value = "";
+      document.getElementById("deviceImageInput").value = "";
+      previewUrlImage("");
+
+      const container = document.getElementById("adminTierRowsContainer");
+      container.innerHTML = "";
+      addAdminTierRow("", "", "MMK");
+      addAdminTierRow("", "", "MMK");
+    }
+
+    function saveAdminProduct(event) {
+      event.preventDefault();
+
+      const editId = document.getElementById("editingProductId").value;
+      const name = document.getElementById("adminProductName").value.trim();
+      const description = document.getElementById("adminProductDesc").value.trim();
+      let image = document.getElementById("adminImageUrlInput").value.trim();
+
+      if (!image) {
+        image = createOfflineSvgArtwork(
+          name.slice(0, 18).toUpperCase(),
+          "Verified Digital Package",
+          "#FF6B00",
+          "#FF9500",
+          `<circle cx="48" cy="48" r="22" fill="none" stroke="#FFFFFF" stroke-width="5"/>`
+        );
+      }
+
+      const tierNodes = document.querySelectorAll("#adminTierRowsContainer .tier-input-row");
+      const prices = Array.from(tierNodes).map((node, i) => ({
+        id: "tier_" + Date.now() + "_" + i,
+        label: node.querySelector(".tier-label-in").value.trim(),
+        amount: parseFloat(node.querySelector(".tier-amount-in").value) || 0,
+        currency: node.querySelector(".tier-curr-in").value.trim() || "MMK"
+      })).filter(t => t.label !== "");
+
+      if (prices.length === 0) return;
+
+      if (editId) {
+        const idx = products.findIndex(p => p.id === editId);
+        if (idx > -1) {
+          products[idx] = { id: editId, name, description, image, prices };
+        }
+      } else {
+        products.unshift({
+          id: "prod_" + Date.now(),
+          name,
+          description,
+          image,
+          prices
+        });
+      }
+
+      saveProductsToStorage();
+      renderProductCatalog();
+      renderAdminProductList();
+      resetAdminForm();
+      showToast(I18N[currentLang].toastSaved);
+    }
+
+    function renderAdminProductList() {
+      const container = document.getElementById("adminProductList");
+      const dict = I18N[currentLang];
+
+      container.innerHTML = products.map(p => `
+        <div class="admin-product-item">
+          <div class="admin-item-left">
+            <img class="admin-item-thumb" src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" />
+            <div style="min-width:0;">
+              <div class="admin-item-title">${escapeHtml(p.name)}</div>
+              <div class="admin-item-sub">${(p.prices || []).length} ${dict.packagesCount}</div>
+            </div>
+          </div>
+          <div class="admin-item-actions">
+            <button type="button" class="icon-action-btn" onclick="editAdminProduct('${p.id}')">${dict.editBtn}</button>
+            <button type="button" class="icon-action-btn delete" onclick="deleteAdminProduct('${p.id}')">${dict.deleteBtn}</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function editAdminProduct(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+
+      document.getElementById("editingProductId").value = product.id;
+      document.getElementById("adminProductName").value = product.name;
+      document.getElementById("adminProductDesc").value = product.description;
+      document.getElementById("adminImageUrlInput").value = product.image;
+      previewUrlImage(product.image);
+
+      const container = document.getElementById("adminTierRowsContainer");
+      container.innerHTML = "";
+      (product.prices || []).forEach(t => addAdminTierRow(t.label, t.amount, t.currency));
+    }
+
+    function deleteAdminProduct(productId) {
+      products = products.filter(p => p.id !== productId);
+      saveProductsToStorage();
+      renderProductCatalog();
+      renderAdminProductList();
+      showToast(I18N[currentLang].toastDeleted);
+    }
+
+    /********************************************************************
+     * 10. OFFLINE JSON BACKUP EXPORT & IMPORT
+     ********************************************************************/
+    function exportCatalogJson() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(products, null, 2));
+      const a = document.createElement("a");
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", "orangeglass_catalog_backup.json");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function importCatalogJson(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            products = imported;
+            saveProductsToStorage();
+            renderProductCatalog();
+            renderAdminProductList();
+            showToast(I18N[currentLang].toastSaved);
+          }
+        } catch (err) {
+          alert("Invalid JSON backup file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /********************************************************************
+     * 11. UTILITIES & INITIALIZATION
+     ********************************************************************/
+    function closeModalOnBackdrop(event, backdropId) {
+      if (event.target.id === backdropId) {
+        document.getElementById(backdropId).classList.remove("open");
+      }
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById("toastBox");
+      document.getElementById("toastMessage").textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2800);
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Initialize Application
+    setLanguage(currentLang);
+  </script>
+</body>
+</html>
